@@ -7,7 +7,7 @@ const broker = net.createServer().listen(PORT, () => {
     console.log(`PubSub Server inicialized on port ${PORT}`);
 });
 
-const obj = [0, 0, 0, 0, 0, 0 ,0];
+const obj = [];
 
 const listeningChannels = [];
 
@@ -15,6 +15,7 @@ function subscribe(channel, socket){
     if(!listeningChannels[channel]){
         listeningChannels[channel] = [];
         logs[channel] = [];
+        obj[channel].push([0, 0, 0, 0, 0, 0 ,0])
     }
 
     console.log(`Subscribing to channel ${channel}`);
@@ -62,8 +63,8 @@ broker.on('connection', (socket) => {
             }
 
             for(let i = 0; i < obj.length; i++){
-                if(!obj[i] === 0){
-                    obj[i] = message;
+                if(!obj[channel][i] === 0){
+                    obj[channel][i] = message;
                 }
             }
 
