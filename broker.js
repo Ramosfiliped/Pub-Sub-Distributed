@@ -15,6 +15,7 @@ function subscribe(channel, socket){
     if(!listeningChannels[channel]){
         listeningChannels[channel] = [];
         logs[channel] = [];
+        obj[channel] = new Array();
         obj[channel].push([0, 0, 0, 0, 0, 0 ,0])
     }
 
@@ -28,7 +29,11 @@ function publish(channel, message){
     lastIndex = logs[channel].length;
     logs[channel].push([lastIndex , message]);
     for(const socket of listeningChannels[channel])
-        socket.write('Log Modified');
+        for(let i = 0; i < logs[channel].length; i++){
+            console.log(logs[channel][i][0].toString()+ " " +logs[channel][i][1]);
+            console.log("============================================")
+            socket.write(logs[channel][i][0].toString()+ " " +logs[channel][i][1])
+        }
     
     return lastIndex;
 }
@@ -55,7 +60,7 @@ broker.on('connection', (socket) => {
             const message = matchPub[2];
             
             indexMyAdquire = publish(channel, 'adquire');
-            lock = canUseTheArray(channel, indexMyAdquire);;
+            lock = canUseTheArray(channel, indexMyAdquire);
             while(!lock){
                 setTimeOut(() => {
                    lock = canUseTheArray(channel, indexMyAdquire);
@@ -79,7 +84,6 @@ broker.on('connection', (socket) => {
 function canUseTheArray(channel, indexAdquire){
     numberOfReleases = 0;
     numberOfAdquire  = 0; 
-    console.log(logs[channel].length)
     for(let i = 0; i < logs[channel].length; i++){
         let data = logs[channel][i];
         if (data[1] === 'release') numberOfReleases++;
